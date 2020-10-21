@@ -188,6 +188,13 @@ open class FRadioPlayer: NSObject {
         return player.rate
     }
     
+    /**
+     The amount of seconds to be buffered by the player. Default value is 0 seconds, this means the AVPlayer will choose an appropriate level of buffering.
+     
+     - Important: This setting will have no effect if `automaticallyWaitsToMinimizeStalling` is set to `true` in the AVPlayer
+     */
+    open var bufferDuration:TimeInterval = 0
+    
     /// Check if the player is playing
     open var isPlaying: Bool {
         switch playbackState {
@@ -359,6 +366,12 @@ open class FRadioPlayer: NSObject {
     open func togglePlaying() {
         isPlaying ? pause() : play()
     }
+    
+    /// Indicates whether the player should automatically delay playback in order to minimize stalling
+    open func automaticallyWaitsToMinimaleStalling(isWaiting: Bool) {
+        player.automaticallyWaitsToMinimizeStalling = isWaiting
+    }
+    
 
     private var asset: AVAsset? = nil
     
@@ -382,6 +395,9 @@ open class FRadioPlayer: NSObject {
         guard let asset = asset else { return }
         state = .loading
         playerItem = AVPlayerItem(asset: asset)
+        
+        playerItem?.preferredForwardBufferDuration = bufferDuration
+        
         playerItemDidChange()
     }
     
